@@ -20,6 +20,9 @@ Linux/Mac: source venv/bin/activate
   Ejecuta el script:
 
 Bash
+
+
+
 python main.py
 
 ---
