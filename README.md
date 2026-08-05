@@ -1,3 +1,4 @@
+Markdown
 # Python Data Processor & Analytics Engine (`py-data-processor`)
 
 A modular Python application designed to process text metrics and safely store reports using both file-based JSON output and an embedded SQLite relational database. Built following industry best practices, clean architecture, and automated test coverage.
@@ -30,3 +31,45 @@ py-data-processor/
 ├── requirements.txt        # Environment dependencies
 ├── .gitignore              # Ignored files (DBs, caches, venv)
 └── README.md               # Project documentation
+Getting Started
+Prerequisites
+Python 3.10+ installed
+
+Git
+
+Installation & Setup
+Clone the repository:
+
+Bash
+git clone [https://github.com/mawerendev/py-data-processor.git](https://github.com/mawerendev/py-data-processor.git)
+cd py-data-processor
+Create and activate a virtual environment:
+
+Windows (PowerShell):
+
+PowerShell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+Linux/macOS:
+
+Bash
+python3 -m venv venv
+source venv/bin/activate
+Install dependencies:
+
+Bash
+pip install -r requirements.txt
+Usage
+Run the main CLI application:
+
+Bash
+python main.py
+Follow the on-screen menu to ingest text data into the database or retrieve historical processing records.
+
+Running Automated Tests
+To execute the complete test suite using pytest:
+
+Bash
+python -m pytest
+Author
+mawerendev - GitHub Profile
