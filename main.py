@@ -1,24 +1,21 @@
 import sys
-from src.ai_engine import AIEngine
+from src.data_processor import DataProcessor
 
 
 def main():
-    # Creamos una instancia de nuestro motor de IA
-    motor = AIEngine(model_name="llama3.2")
+    processor = DataProcessor()
 
-    print("=== Servidor Local de IA (Estructura Modular) ===")
-    entrada = input("Ingresa tu pregunta: ")
+    print("=== Procesador e Ingestor de Datos Locales ===")
+    entrada = input("Ingresa un párrafo o texto largo para procesar: ")
 
     if not entrada.strip():
-        print("No ingresaste ningún texto.")
-        return
+        print("Entrada vacía. Abortando.")
+        sys.exit(1)
 
-    print("\n[Procesando con el motor local...]")
-    respuesta = motor.consultar(entrada)
+    print("\n[Procesando estructuras en disco...]")
+    resultado = processor.analizar_y_guardar(entrada)
 
-    print("\n--- RESPUESTA ---")
-    print(respuesta)
-    print("-----------------\n")
+    print(f"\n{resultado}\n")
 
 
 if __name__ == "__main__":
