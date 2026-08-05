@@ -1,25 +1,24 @@
 import sys
-
-
-def analizar_texto(texto):
-    palabras = texto.split()
-    num_palabras = len(palabras)
-    num_caracteres = len(texto)
-
-    print("\n--- RESULTADOS DEL ANÁLISIS ---")
-    print(f"Total de caracteres: {num_caracteres}")
-    print(f"Total de palabras: {num_palabras}")
-    print("-------------------------------\n")
+from src.ai_engine import AIEngine
 
 
 def main():
-    print("=== Mi Primer Script en Python ===")
-    entrada = input("Escribe una frase o texto para analizar: ")
+    # Creamos una instancia de nuestro motor de IA
+    motor = AIEngine(model_name="llama3.2")
 
-    if entrada.strip():
-        analizar_texto(entrada)
-    else:
+    print("=== Servidor Local de IA (Estructura Modular) ===")
+    entrada = input("Ingresa tu pregunta: ")
+
+    if not entrada.strip():
         print("No ingresaste ningún texto.")
+        return
+
+    print("\n[Procesando con el motor local...]")
+    respuesta = motor.consultar(entrada)
+
+    print("\n--- RESPUESTA ---")
+    print(respuesta)
+    print("-----------------\n")
 
 
 if __name__ == "__main__":
