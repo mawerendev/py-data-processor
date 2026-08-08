@@ -18,3 +18,8 @@ reports/
 # Archivos de configuración del editor
 .vscode/
 .idea/
+venv/
+__pycache__/
+*.db
+.pytest_cache/
+reports/
