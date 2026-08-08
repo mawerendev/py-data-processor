@@ -1,4 +1,4 @@
-# Python Data Processor & Analytics Engine (`py-data-processor`)
+# Python Data Processor & Analytics API (`py-data-processor`)
 
 A modular Python REST API designed to process text metrics and safely store reports using both file-based JSON output and an embedded SQLite relational database. Built following industry best practices, clean architecture, and automated test coverage.
 
@@ -31,3 +31,22 @@ py-data-processor/
 ├── requirements.txt        # Environment dependencies
 ├── .gitignore              # Ignored files (DBs, caches, venv)
 └── README.md               # Project documentation
+Quick Start
+1. Environment Setup
+PowerShell
+# Create and activate virtual environment
+python -m venv venv
+.\venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+2. Run the API Server
+PowerShell
+uvicorn main:app --reload
+Access the interactive API documentation at http://127.0.0.1:8000/docs.
+
+3. Run Test Suite
+PowerShell
+python -m pytest
+Author
+mawerendev - GitHub Profile
