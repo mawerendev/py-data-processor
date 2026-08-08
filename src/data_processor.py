@@ -15,6 +15,19 @@ class DataProcessor:
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
 
+    @staticmethod
+    def process_text(text: str) -> Dict[str, Any]:
+        """
+        Extracts core structural metrics from the input string.
+        Matches the interface expected by main.py and unit tests.
+        """
+        words = text.split()
+        return {
+            "char_count": len(text),
+            "word_count": len(words),
+            "longest_word": max(words, key=len) if words else "",
+        }
+
     def analizar_y_guardar(self, text: str, filename: str = "reporte.json") -> str:
         """
         Analyzes the input text to extract structural metrics and saves

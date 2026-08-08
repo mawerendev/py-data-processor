@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web_api:
+    build: .
+    container_name: py_data_processor_api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mantiene la persistencia de la base de datos SQLite montando una carpeta local
+      - .:/app
+    restart: always

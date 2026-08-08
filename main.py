@@ -1,45 +1,95 @@
-import sys
-from src.data_processor import DataProcessor
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel, Field
+import uvicorn
+
 from src.db_manager import DatabaseManager
+from src.data_processor import DataProcessor
+
+# Inicializar la aplicación FastAPI
+app = FastAPI(
+    title="Data Processor & Analytics API",
+    description="API REST para procesar métricas de texto y persistirlas en SQLite.",
+    version="1.0.0"
+)
+
+# Instanciar servicios (DatabaseManager ya crea la tabla al inicializarse en su __init__)
+db_manager = DatabaseManager()
+
+# Esquema de Pydantic para validar la petición HTTP entrante
+class TextProcessRequest(BaseModel):
+    content: str = Field(
+        ...,
+        min_length=1,
+        description="El texto a procesar. No puede estar vacío.",
+        examples=["Hola mundo desde FastAPI"]
+    )
 
 
-def main():
-    processor = DataProcessor()
-    db = DatabaseManager()
+# Esquema de Pydantic para estructurar la respuesta HTTP exitosa
+class TextProcessResponse(BaseModel):
+    id: int
+    content: str
+    char_count: int
+    word_count: int
+    longest_word: str
+    status: str = "success"
 
-    print("=== Engine de Datos e Ingestión SQL ===")
-    print("1. Procesar nuevo texto y guardar en BD")
-    print("2. Ver historial de reportes en BD")
-    opcion = input("Selecciona una opción (1 o 2): ").strip()
 
-    if opcion == "1":
-        entrada = input("\nIngresa el texto a analizar: ")
-        if not entrada.strip():
-            print("Entrada vacía. Operación cancelada.")
-            return
+@app.get("/", tags=["Health Check"])
+def read_root():
+    """Endpoint de salud para verificar que el servidor está corriendo."""
+    return {"status": "online", "message": "API de Procesamiento de Datos activa"}
 
-        # Calculamos métricas y guardamos en SQLite
-        words = entrada.split()
-        longest = max(words, key=len) if words else ""
-        
-        record_id = db.save_report(
-            text=entrada,
-            total_chars=len(entrada),
-            total_words=len(words),
-            longest_word=longest
+
+@app.post(
+    "/api/v1/process-text",
+    response_model=TextProcessResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Metrics Processing"]
+)
+def process_and_save_text(request: TextProcessRequest):
+    """
+    Endpoint HTTP que:
+    1. Recibe y valida el texto entrante vía Pydantic.
+    2. Procesa las métricas (caracteres, palabras, palabra más larga).
+    3. Persiste el resultado en SQLite.
+    4. Devuelve la respuesta estructurada en JSON.
+    """
+    raw_text = request.content.strip()
+
+    if not raw_text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El texto no puede contener únicamente espacios en blanco."
         )
-        print(f"\n[Exito] Reporte insertado en la base de datos con ID: {record_id}\n")
 
-    elif opcion == "2":
-        registros = db.fetch_all_reports()
-        print(f"\n--- HISTORIAL DE REGISTROS EN BD ({len(registros)}) ---")
-        for r in registros:
-            print(f"ID: {r['id']} | Palabras: {r['total_words']} | Creado: {r['created_at']}")
-            print(f"   Texto: '{r['input_text'][:40]}...'")
-            print(f"   Palabra más larga: '{r['longest_word']}'\n")
-    else:
-        print("Opción no válida.")
+    try:
+        # 1. Calcular métricas
+        metrics = DataProcessor.process_text(raw_text)
+
+        # 2. Persistir en la base de datos
+        record_id = db_manager.save_report(
+            content=raw_text,
+            char_count=metrics["char_count"],
+            word_count=metrics["word_count"],
+            longest_word=metrics["longest_word"]
+        )
+
+        # 3. Retornar la respuesta tipada
+        return TextProcessResponse(
+            id=record_id,
+            content=raw_text,
+            char_count=metrics["char_count"],
+            word_count=metrics["word_count"],
+            longest_word=metrics["longest_word"]
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al procesar y guardar la información: {str(e)}"
+        )
 
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
